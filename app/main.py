@@ -2,9 +2,8 @@ from fastapi import FastAPI, Query
 from langchain.vectorstores import FAISS
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
-from langchain.llms import HuggingFacePipeline
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-import torch
+from langchain.llms import LlamaCpp
+import os
 
 app = FastAPI()
 
@@ -12,14 +11,21 @@ app = FastAPI()
 embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 db = FAISS.load_local("app/embeddings", embedding)
 
-# Load LLM (Gemma 2B quantizado via llama.cpp não entra aqui; isso é pra modelo local via transformers)
-model_id = "google/gemma-2b-it"  # caso use Transformers
-tokenizer = AutoTokenizer.from_pretrained(model_id)
-model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=torch.float16, device_map="auto")
+# Caminho do modelo Phi-2 GGUF (já deve estar no servidor)
+modelo_path = "modelo/phi2.gguf"
 
-pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=300)
-llm = HuggingFacePipeline(pipeline=pipe)
+# Cria o wrapper para LlamaCpp
+llm = LlamaCpp(
+    model_path=modelo_path,
+    n_ctx=1024,
+    n_batch=128,
+    n_threads=2,
+    temperature=0.7,
+    max_tokens=300,
+    verbose=False
+)
 
+# QA com base vetorial
 qa = RetrievalQA.from_chain_type(llm=llm, retriever=db.as_retriever())
 
 @app.get("/")
