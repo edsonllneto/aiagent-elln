@@ -1,7 +1,3 @@
 fastapi
 uvicorn
-torch
-transformers
-sentence-transformers
-langchain
-faiss-cpu
+llama-cpp-python
