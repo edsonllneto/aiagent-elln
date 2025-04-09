@@ -9,13 +9,14 @@ COPY . .
 
 # Instala dependências do sistema e Python
 RUN apt-get update && \
-    apt-get install -y wget && \
+    apt-get install -y wget gcc g++ cmake && \
+    pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Garante que a pasta do modelo existe (modelo será enviado manualmente)
 RUN mkdir -p modelo
 
-# gerar base conhecimento
+# Gera a base de conhecimento
 RUN python3 app/gerar_conhecimento.py
 
 # Expõe a porta da API
