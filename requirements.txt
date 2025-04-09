@@ -1,3 +1,6 @@
 fastapi
 uvicorn
 llama-cpp-python
+langchain
+sentence-transformers
+faiss-cpu
