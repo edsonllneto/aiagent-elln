@@ -1,26 +1,24 @@
-# Usa imagem base leve com Python
 FROM python:3.10-slim
 
-# Define diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copia os arquivos do projeto para o container
 COPY . .
 
-# Instala dependências do sistema e Python
+# Instala apenas o necessário para compilar se precisar
 RUN apt-get update && \
-    apt-get install -y wget gcc g++ cmake && \
+    apt-get install -y gcc g++ cmake && \
     pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt && \
+    apt-get remove -y gcc g++ cmake && \
+    apt-get autoremove -y && \
+    apt-get clean
 
-# Garante que a pasta do modelo existe (modelo será enviado manualmente)
+# Garante a pasta do modelo
 RUN mkdir -p modelo
 
-# Gera a base de conhecimento
+# Gera base de conhecimento
 RUN python3 app/gerar_conhecimento.py
 
-# Expõe a porta da API
 EXPOSE 8000
 
-# Inicia a API FastAPI com Uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
