@@ -15,6 +15,9 @@ RUN apt-get update && \
 # Garante que a pasta do modelo existe (modelo será enviado manualmente)
 RUN mkdir -p modelo
 
+# gerar base conhecimento
+RUN python3 app/gerar_conhecimento.py
+
 # Expõe a porta da API
 EXPOSE 8000
 
