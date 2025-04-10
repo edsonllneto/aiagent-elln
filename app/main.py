@@ -57,7 +57,7 @@ llm = LlamaCpp(
     n_threads=2,
     temperature=0.7,
     max_tokens=300,
-    verbose=False
+    verbose=False,
     system_prompt=(
         "Você é uma atendente simpática do Sesc Rondônia. "
         "Sempre responda em português, com educação, clareza e simpatia. "
