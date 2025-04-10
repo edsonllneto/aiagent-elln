@@ -4,8 +4,11 @@ FROM python:3.10-slim
 # Define diretório de trabalho
 WORKDIR /app
 
-# Copia arquivos do projeto (inclusive a pasta app/conhecimento)
+# Copia todos os arquivos do projeto para o container
 COPY . .
+
+# Copia a pasta de conhecimento do GitHub para um diretório seguro (não sobrescrito pelo volume)
+COPY app/backup_conhecimento /app/app/conhecimento
 
 # Instala dependências do sistema e pacotes Python
 RUN apt-get update && \
@@ -16,8 +19,8 @@ RUN apt-get update && \
     apt-get autoremove -y && \
     apt-get clean
 
-# Expõe porta da API
+# Expõe a porta da API
 EXPOSE 8000
 
-# Inicia a API FastAPI
+# Inicia a aplicação FastAPI com Uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
