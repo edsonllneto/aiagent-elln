@@ -4,7 +4,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 
 # 1. Carrega o conteúdo do arquivo com as informações do Sesc
-with open("app/conhecimento.txt", "r", encoding="utf-8") as f:
+with open("app/conhecimento/conhecimento.txt", "r", encoding="utf-8") as f:
     conteudo = f.read()
 
 # 2. Divide o conteúdo em partes menores (chunks)
