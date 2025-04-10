@@ -26,18 +26,21 @@ if not os.path.exists(modelo_path):
     ])
     print("✅ Modelo baixado com sucesso!")
 
-# Inicializa volume de conhecimento se estiver vazio
+# Caminhos para conhecimento
 origem_backup = "/app/backup_conhecimento"
 destino_conhecimento = "/app/conhecimento"
 
-if os.path.exists(origem_backup) and (not os.path.exists(destino_conhecimento) or not os.listdir(destino_conhecimento)):
-    print("📁 Volume de conhecimento está vazio. Copiando arquivos iniciais...")
-    os.makedirs(destino_conhecimento, exist_ok=True)
-    for arquivo in os.listdir(origem_backup):
-        origem = os.path.join(origem_backup, arquivo)
-        destino = os.path.join(destino_conhecimento, arquivo)
-        shutil.copy2(origem, destino)
-    print("✅ Arquivos de conhecimento copiados.")
+# Garante que a pasta de destino exista
+os.makedirs(destino_conhecimento, exist_ok=True)
+
+# Copia os arquivos de conhecimento para o volume, se estiver vazio
+try:
+    if os.path.exists(origem_backup) and not os.listdir(destino_conhecimento):
+        print("📁 Volume de conhecimento está vazio. Copiando arquivos iniciais...")
+        shutil.copytree(origem_backup, destino_conhecimento, dirs_exist_ok=True)
+        print("✅ Arquivos de conhecimento copiados.")
+except Exception as e:
+    print(f"❌ Erro ao copiar conhecimento: {e}")
 
 # Carrega modelo de embeddings e FAISS index
 embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
