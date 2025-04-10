@@ -4,9 +4,14 @@ WORKDIR /app
 
 COPY . .
 
-# Instala apenas o gdown e baixa o modelo
-RUN pip install gdown && \
-    mkdir -p modelo && \
+# Instala somente utilitário para baixar o modelo
+RUN apt-get update && \
+    apt-get install -y wget && \
+    pip install --no-cache-dir gdown && \
+    apt-get clean
+
+# Cria diretório do modelo e baixa o arquivo via Google Drive
+RUN mkdir -p modelo && \
     gdown https://drive.google.com/uc?id=1lhxoUMyKeOkpvchbjihIGTCEbV3x_Bt9 -O modelo/phi2.gguf
 
 # Gera a base de conhecimento
