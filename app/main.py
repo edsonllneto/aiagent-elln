@@ -27,7 +27,7 @@ if not os.path.exists(modelo_path):
 
 # Load embedding model and FAISS index
 embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-db = FAISS.load_local("app/embeddings", embedding, allow_dangerous_deserialization=True)
+db = FAISS.load_local("conhecimento/embeddings", embedding, allow_dangerous_deserialization=True)
 
 # Cria o wrapper para LlamaCpp
 llm = LlamaCpp(
