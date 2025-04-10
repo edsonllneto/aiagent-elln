@@ -9,18 +9,11 @@ import shutil
 
 app = FastAPI()
 
-# Caminhos importantes
+# === MODELO ===
 modelo_path = "modelo/phi2.gguf"
 modelo_drive_id = "1lhxoUMyKeOkpvchbjihIGTCEbV3x_Bt9"
-origem_backup = "/app/backup_conhecimento"
-destino_conhecimento = "/app/conhecimento"
-caminho_embeddings = os.path.join(destino_conhecimento, "embeddings")
-index_faiss_path = os.path.join(caminho_embeddings, "index.faiss")
-
-# Cria a pasta do modelo se não existir
 os.makedirs(os.path.dirname(modelo_path), exist_ok=True)
 
-# Baixa o modelo se não existir
 if not os.path.exists(modelo_path):
     print("🔽 Baixando modelo phi2.gguf do Google Drive...")
     subprocess.run([
@@ -30,20 +23,22 @@ if not os.path.exists(modelo_path):
     ])
     print("✅ Modelo baixado com sucesso!")
 
-# Cria pasta do volume conhecimento, se não existir
-os.makedirs(destino_conhecimento, exist_ok=True)
+# === CONHECIMENTO ===
+volume_conhecimento = "/app/conhecimento"
+repositorio_conhecimento = "/app/app/conhecimento"  # <- pasta vinda do GitHub
 
-# Só copia do backup se o index ainda não existe
-if os.path.exists(origem_backup) and not os.path.exists(index_faiss_path):
-    print("📁 Nenhuma base de conhecimento encontrada. Copiando arquivos de exemplo...")
-    shutil.copytree(origem_backup, destino_conhecimento, dirs_exist_ok=True)
-    print("✅ Arquivos padrão copiados para o volume.")
+# Se o volume estiver vazio, copia os arquivos do repositório
+if os.path.exists(repositorio_conhecimento) and not os.listdir(volume_conhecimento):
+    print("📁 Volume de conhecimento está vazio. Copiando arquivos iniciais...")
+    shutil.copytree(repositorio_conhecimento, volume_conhecimento, dirs_exist_ok=True)
+    print("✅ Arquivos de conhecimento copiados com sucesso!")
 
-# Carrega modelo de embeddings e FAISS index
+# === VETORES E EMBEDDINGS ===
 embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+caminho_embeddings = os.path.join(volume_conhecimento, "embeddings")
 db = FAISS.load_local(caminho_embeddings, embedding, allow_dangerous_deserialization=True)
 
-# Configura modelo LlamaCpp (Phi-2)
+# === LLM ===
 llm = LlamaCpp(
     model_path=modelo_path,
     n_ctx=1024,
@@ -54,9 +49,9 @@ llm = LlamaCpp(
     verbose=False
 )
 
-# Cria chain de QA
 qa = RetrievalQA.from_chain_type(llm=llm, retriever=db.as_retriever())
 
+# === ROTAS ===
 @app.get("/")
 def root():
     return {"status": "online"}
