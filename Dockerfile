@@ -7,16 +7,12 @@ WORKDIR /app
 # Copia arquivos do projeto
 COPY . .
 
-# Instala dependências do sistema
+# Instala dependências do sistema e pacotes Python
 RUN apt-get update && \
-    apt-get install -y wget gcc g++ cmake
-
-# Instala pacotes Python
-RUN pip install --upgrade pip && \
+    apt-get install -y wget gcc g++ cmake && \
+    pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
-
-# Remove ferramentas de build para deixar imagem mais leve
-RUN apt-get remove -y gcc g++ cmake && \
+    apt-get remove -y gcc g++ cmake && \
     apt-get autoremove -y && \
     apt-get clean
 
