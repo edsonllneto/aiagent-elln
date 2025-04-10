@@ -1,15 +1,15 @@
 from fastapi import FastAPI, Query
 from langchain_community.vectorstores import FAISS
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
-from langchain.llms import LlamaCpp
+from langchain_community.llms import LlamaCpp
 import os
 
 app = FastAPI()
 
 # Load embedding model and FAISS index
 embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-db = FAISS.load_local("app/embeddings", embedding)
+db = FAISS.load_local("app/embeddings", embedding, allow_dangerous_deserialization=True)
 
 # Caminho do modelo Phi-2 GGUF (já deve estar no servidor)
 modelo_path = "modelo/phi2.gguf"
