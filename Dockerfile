@@ -7,17 +7,21 @@ WORKDIR /app
 # Copia arquivos do projeto
 COPY . .
 
-# Instala dependências do sistema e Python
+# Instala dependências do sistema
 RUN apt-get update && \
-    apt-get install -y wget gcc g++ cmake && \
-    pip install --upgrade pip && \
+    apt-get install -y wget gcc g++ cmake
+
+# Instala pacotes Python
+RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir gdown && \
-    apt-get remove -y gcc g++ cmake && \
+    pip install --no-cache-dir gdown
+
+# Remove ferramentas de build para deixar imagem mais leve
+RUN apt-get remove -y gcc g++ cmake && \
     apt-get autoremove -y && \
     apt-get clean
 
-# Cria diretório do modelo e baixa o arquivo via Google Drive
+# Baixa o modelo Phi-2
 RUN mkdir -p modelo && \
     gdown https://drive.google.com/uc?id=1lhxoUMyKeOkpvchbjihIGTCEbV3x_Bt9 -O modelo/phi2.gguf
 
