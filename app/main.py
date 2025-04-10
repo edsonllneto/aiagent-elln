@@ -9,7 +9,7 @@ import shutil
 
 app = FastAPI()
 
-# === MODELO ===
+# === CONFIGURAÇÃO DO MODELO LOCAL ===
 modelo_path = "modelo/phi2.gguf"
 modelo_drive_id = "1lhxoUMyKeOkpvchbjihIGTCEbV3x_Bt9"
 os.makedirs(os.path.dirname(modelo_path), exist_ok=True)
@@ -25,15 +25,26 @@ if not os.path.exists(modelo_path):
 
 # === CONHECIMENTO ===
 volume_conhecimento = "/app/conhecimento"
-repositorio_conhecimento = "/app/app/conhecimento"  # <- pasta vinda do GitHub
+repositorio_conhecimento = "/app/app/backup_conhecimento"  # conforme estrutura do GitHub
 
-# Se o volume estiver vazio, copia os arquivos do repositório
-if os.path.exists(repositorio_conhecimento) and not os.listdir(volume_conhecimento):
+# Logs de verificação
+print(f"📦 Verificando pasta de origem: {repositorio_conhecimento}")
+print("📂 Existe backup_conhecimento?", os.path.exists(repositorio_conhecimento))
+print(f"📦 Verificando conteúdo de: {volume_conhecimento}")
+if os.path.exists(volume_conhecimento):
+    print("📁 Conteúdo atual do volume:", os.listdir(volume_conhecimento))
+else:
+    print("❌ Volume de conhecimento não existe!")
+
+# Copia os arquivos apenas se o volume estiver vazio
+if os.path.exists(repositorio_conhecimento) and os.path.exists(volume_conhecimento) and not os.listdir(volume_conhecimento):
     print("📁 Volume de conhecimento está vazio. Copiando arquivos iniciais...")
     shutil.copytree(repositorio_conhecimento, volume_conhecimento, dirs_exist_ok=True)
     print("✅ Arquivos de conhecimento copiados com sucesso!")
+else:
+    print("⚠️ Volume já possui arquivos ou diretório de backup não encontrado. Nada será copiado.")
 
-# === VETORES E EMBEDDINGS ===
+# === EMBEDDINGS ===
 embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 caminho_embeddings = os.path.join(volume_conhecimento, "embeddings")
 db = FAISS.load_local(caminho_embeddings, embedding, allow_dangerous_deserialization=True)
