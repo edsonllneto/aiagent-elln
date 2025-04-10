@@ -4,12 +4,13 @@ WORKDIR /app
 
 COPY . .
 
-# Dependências já instaladas no container anterior, então você pode manter comentado:
-# RUN pip install --upgrade pip && \
-#     pip install --no-cache-dir -r requirements.txt
+# Instala apenas o gdown e baixa o modelo
+RUN pip install gdown && \
+    mkdir -p modelo && \
+    gdown https://drive.google.com/uc?id=1lhxoUMyKeOkpvchbjihIGTCEbV3x_Bt9 -O modelo/phi2.gguf
 
-# Não roda o script aqui, pois ele falhou no último build
-# RUN python3 app/gerar_conhecimento.py
+# Gera a base de conhecimento
+RUN python3 app/gerar_conhecimento.py
 
 EXPOSE 8000
 
