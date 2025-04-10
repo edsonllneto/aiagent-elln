@@ -1,25 +1,28 @@
+# Usa imagem leve com Python
 FROM python:3.10-slim
 
+# Define diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copia tudo antes da instalação
+# Copia todos os arquivos do projeto
 COPY . .
 
-# Instala compiladores e dependências para build do llama-cpp-python
+# Instala utilitários e dependências de compilação necessárias
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc g++ cmake wget && \
+    apt-get install -y wget gcc g++ cmake && \
     pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
-    apt-get purge -y --auto-remove gcc g++ cmake wget && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /root/.cache/pip
+    pip install --no-cache-dir gdown && \
+    apt-get remove -y gcc g++ cmake && \
+    apt-get autoremove -y && \
+    apt-get clean
 
-# Cria pasta do modelo
-RUN mkdir -p modelo
+# Cria diretório e baixa modelo Phi-2 do Google Drive
+RUN mkdir -p modelo && \
+    gdown https://drive.google.com/uc?id=1lhxoUMyKeOkpvchbjihIGTCEbV3x_Bt9 -O modelo/phi2.gguf
 
-# Gera a base de conhecimento (ajuste o script se necessário)
-RUN python3 app/gerar_conhecimento.py
-
+# Expondo porta da API
 EXPOSE 8000
 
-# Inicia a API com Uvicorn
+# Inicia a API FastAPI com Uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
