@@ -21,9 +21,6 @@ RUN apt-get update && \
 RUN mkdir -p modelo && \
     gdown https://drive.google.com/uc?id=1lhxoUMyKeOkpvchbjihIGTCEbV3x_Bt9 -O modelo/phi2.gguf
 
-# Gera a base de conhecimento
-RUN python3 app/gerar_conhecimento.py
-
 # Expõe porta da API
 EXPOSE 8000
 
