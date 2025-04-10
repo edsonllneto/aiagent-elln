@@ -21,10 +21,6 @@ RUN apt-get remove -y gcc g++ cmake && \
     apt-get autoremove -y && \
     apt-get clean
 
-# Baixa o modelo Phi-2
-RUN mkdir -p modelo && \
-    gdown https://drive.google.com/uc?id=1lhxoUMyKeOkpvchbjihIGTCEbV3x_Bt9 -O modelo/phi2.gguf
-
 # Expõe porta da API
 EXPOSE 8000
 
