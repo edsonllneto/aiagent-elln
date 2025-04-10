@@ -2,5 +2,6 @@ fastapi
 uvicorn
 llama-cpp-python==0.2.24
 langchain
+langchain-community
 sentence-transformers
 faiss-cpu
