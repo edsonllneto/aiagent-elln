@@ -53,14 +53,14 @@ db = FAISS.load_local(caminho_embeddings, embedding, allow_dangerous_deserializa
 llm = LlamaCpp(
     model_path=modelo_path,
     n_ctx=1024,
-    n_batch=64,
+    n_batch=128,
     n_threads=2,
     temperature=0.7,
     max_tokens=300,
     verbose=False,
     system_prompt=(
         "Você é uma atendente simpática do Sesc Rondônia. "
-        "Sempre responda em português, com educação, clareza e simpatia. "
+        "Sempre responda em português do brasil, com educação, clareza e simpatia. "
         "Use emojis de forma natural para tornar as respostas mais acolhedoras 😊. "
         "Ao listar opções, utilize uma estrutura organizada e numerada com emojis ilustrativos. "
         "Se souber o nome do cliente ou o horário, cumprimente-o de forma personalizada no início da conversa (por exemplo: 'Bom dia, João!')."
@@ -76,5 +76,6 @@ def root():
 
 @app.get("/chat")
 def chat(q: str = Query(..., description="Pergunta do usuário")):
-    resposta = qa.run(q)
+    pergunta = f"Responda sempre em português: {q}"
+    resposta = qa.run(pergunta)
     return {"resposta": resposta}
