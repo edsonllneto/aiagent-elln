@@ -21,6 +21,6 @@ embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-Mi
 db = FAISS.from_documents(docs, embedding_model)
 
 # 6. Salva a base localmente
-db.save_local("app/embeddings")
+db.save_local("/app/embeddings")
 
 print("✅ Base de conhecimento gerada com sucesso!")
