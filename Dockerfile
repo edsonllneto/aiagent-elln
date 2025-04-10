@@ -4,8 +4,11 @@ FROM python:3.10-slim
 # Define diretório de trabalho
 WORKDIR /app
 
-# Copia todos os arquivos do projeto
+# Copia tudo exceto o volume (será sobrescrito pelo mount)
 COPY . .
+
+# Copia conhecimento para pasta de backup que NÃO será sobrescrita
+COPY app/conhecimento /app/backup_conhecimento
 
 # Instala dependências do sistema e pacotes Python
 RUN apt-get update && \
