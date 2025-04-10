@@ -14,7 +14,6 @@ RUN apt-get update && \
 # Instala pacotes Python
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir gdown
 
 # Remove ferramentas de build para deixar imagem mais leve
 RUN apt-get remove -y gcc g++ cmake && \
