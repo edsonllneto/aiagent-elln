@@ -5,6 +5,7 @@ from langchain.chains import RetrievalQA
 from langchain_community.llms import LlamaCpp
 import os
 import subprocess
+import shutil
 
 app = FastAPI()
 
@@ -25,7 +26,16 @@ if not os.path.exists(modelo_path):
     ])
     print("✅ Modelo baixado com sucesso!")
 
-# Load embedding model and FAISS index
+# Copia arquivos de conhecimento padrão para o volume, se necessário
+origem_backup = "/app/backup_conhecimento"
+destino_conhecimento = "/app/conhecimento"
+
+if os.path.exists(origem_backup) and not os.listdir(destino_conhecimento):
+    print("📁 Volume de conhecimento está vazio. Copiando arquivos iniciais...")
+    shutil.copytree(origem_backup, destino_conhecimento, dirs_exist_ok=True)
+    print("✅ Arquivos de conhecimento copiados.")
+
+# Carrega modelo de embeddings e FAISS index
 embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 db = FAISS.load_local("conhecimento/embeddings", embedding, allow_dangerous_deserialization=True)
 
