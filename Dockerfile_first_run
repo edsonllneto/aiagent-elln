@@ -1,13 +1,13 @@
 # Usa imagem leve com Python
 FROM python:3.10-slim
 
-# Define diretório de trabalho dentro do container
+# Define diretório de trabalho
 WORKDIR /app
 
-# Copia todos os arquivos do projeto
+# Copia arquivos do projeto
 COPY . .
 
-# Instala utilitários e dependências de compilação necessárias
+# Instala dependências do sistema + Python
 RUN apt-get update && \
     apt-get install -y wget gcc g++ cmake && \
     pip install --upgrade pip && \
@@ -17,12 +17,15 @@ RUN apt-get update && \
     apt-get autoremove -y && \
     apt-get clean
 
-# Cria diretório e baixa modelo Phi-2 do Google Drive
+# Cria pasta e baixa modelo Phi-2
 RUN mkdir -p modelo && \
     gdown https://drive.google.com/uc?id=1lhxoUMyKeOkpvchbjihIGTCEbV3x_Bt9 -O modelo/phi2.gguf
+
+# Gera base de conhecimento
+RUN python3 app/gerar_conhecimento.py
 
 # Expondo porta da API
 EXPOSE 8000
 
-# Inicia a API FastAPI com Uvicorn
+# Inicia a API FastAPI
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
